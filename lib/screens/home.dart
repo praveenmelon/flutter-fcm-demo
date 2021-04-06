@@ -23,10 +23,23 @@ class _HomeState extends State<Home> {
       RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
       print(message.data);
+      _setMessage(message);
     });
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('A new onMessageOpenedApp event was published!');
       print(message.data);
+      _setMessage(message);
+    });
+  }
+
+  _setMessage(RemoteMessage message) {
+    final data = message.data;
+    final String title = message.notification.title;
+    final String body = message.notification.body;
+    final String mMessage = data['message'];
+    setState(() {
+      Message m = Message(title: title, body: body, message: mMessage);
+      _messages.add(m);
     });
   }
 
@@ -44,7 +57,21 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Flutter FCM"),
+        centerTitle: true,
       ),
+      body: ListView.builder(
+          itemCount: _messages.length,
+          itemBuilder: (context, index) {
+            return Card(
+              child: Padding(
+                padding: EdgeInsets.all(15.0),
+                child: Text(
+                  _messages[index].message,
+                  style: TextStyle(fontSize: 16.0, color: Colors.black),
+                ),
+              ),
+            );
+          }),
     );
   }
 }
