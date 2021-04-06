@@ -1,6 +1,6 @@
 # flutter_fcm_demo
 
-A new Flutter application for firebase messaging and cloud fuction
+A new Flutter application for firebase messaging and cloud functioning.
 
 ## Getting Started
 
