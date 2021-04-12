@@ -8,6 +8,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   List<Message> _messages;
   _getToken() {
@@ -18,17 +19,24 @@ class _HomeState extends State<Home> {
     );
   }
 
-  _configureFirebaseListner() {
+  void showInSnackBar(BuildContext context,String value,) {
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value),duration: Duration(milliseconds: 9000),));
+  }
+
+  _configureFirebaseListner(BuildContext contextt) {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
       print(message.data);
       _setMessage(message);
+      showInSnackBar(contextt,'received');
     });
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('A new onMessageOpenedApp event was published!');
       print(message.data);
+
       _setMessage(message);
+      showInSnackBar(contextt,'received');
     });
   }
 
@@ -49,12 +57,13 @@ class _HomeState extends State<Home> {
     super.initState();
     _messages = [];
     _getToken();
-    _configureFirebaseListner();
+    _configureFirebaseListner(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text("Flutter FCM"),
         centerTitle: true,
@@ -66,7 +75,7 @@ class _HomeState extends State<Home> {
               child: Padding(
                 padding: EdgeInsets.all(15.0),
                 child: Text(
-                  _messages[index].message,
+                  _messages[index].title,
                   style: TextStyle(fontSize: 16.0, color: Colors.black),
                 ),
               ),
